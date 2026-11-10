@@ -4,9 +4,13 @@ services:
     image: gonesharathchandragone/dockerjava:dbimage
     ports:
       - "3306:3306"
+    deploy:
+      replicas: 2
   app:
     image: gonesharathchandragone/dockerjava:appimage
     ports:
       - "8080:8080"
+    deploy:
+      replicas: 2
     depends_on:
       - db
