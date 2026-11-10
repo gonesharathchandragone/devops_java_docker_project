@@ -10,6 +10,10 @@ services:
     image: gonesharathchandragone/dockerjava:appimage
     ports:
       - "8080:8080"
+    environment:
+      - DB_URL: "jdbc:mysql://db:3306/institute?useSSL=false&allowPublicKeyRetrieval=true"
+      - DB_USER: appuser
+      - DB_PASSWORD: apppass
     deploy:
       replicas: 2
     depends_on:
