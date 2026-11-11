@@ -1,0 +1,11 @@
+---
+apiversion: v1
+kind: Pod
+metadata:
+  name: sql-pod
+spec:
+  containers:
+    - name: sql-container
+      image: gonesharathchandragone/dockerjava:dbimage
+      ports:
+        - containerPort: 3306
