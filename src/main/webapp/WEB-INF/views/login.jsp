@@ -5,12 +5,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login | Sharath DevOps Institute</title>
+  <title>Login | Yeshwanth DevOps Institute</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body class="login-page">
   <div class="login-card">
-    <h1>Sharath DevOps Institute</h1>
+    <h1>Yeshwanth DevOps Institute</h1>
     <p class="tagline">Learn DevOps. Build your career.</p>
 
     <c:if test="${not empty error}">
