@@ -1,0 +1,75 @@
+pipeline {
+    agent {
+        node {
+            label 'manager'
+        }
+    }
+    tools {
+        maven 'mymaven'
+    }
+
+    stages {
+        stage('checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/gonesharathchandragone/devops_java_docker_project.git'
+            }
+        }
+        stage ('CQC') {
+            steps {
+               withSonarQubeEnv('sonarqube') {
+         sh '''
+          mvn clean verify \
+          org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar \
+          -Dsonar.projectKey=docker-project
+             '''
+            }
+            }
+        }
+        stage ('build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage ('artifact') {
+            steps {
+                nexusArtifactUploader artifacts: [[artifactId: 'sharath-devops-institute', classifier: '', file: 'target/sharath-devops-institute.war', type: 'war']], credentialsId: 'nexus_cred', groupId: 'com.sharathdevops', nexusUrl: '54.160.52.160:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'myrepo', version: '1.0.0'
+            }
+        }
+        stage ('dockerbuild') {
+            steps {
+                sh ''' 
+                  docker build -t gonesharathchandragone/instituteapplication:app .
+                  docker build -t gonesharathchandragone/instituteapplication:db ./sql/
+                  '''
+            }
+        }
+        stage ('trivy') {
+            steps {
+              sh '''
+                  trivy image gonesharathchandragone/instituteapplication:app
+                  trivy image gonesharathchandragone/instituteapplication:db
+                  '''
+             }
+        }
+        stage ('push') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'dockerhub_cred') {
+                     sh '''
+                        docker push gonesharathchandragone/instituteapplication:app
+                        docker push gonesharathchandragone/instituteapplication:db
+                        '''
+                   } 
+                }
+                
+            }
+        }
+        stage ('deploy') {
+            steps {
+                sh '''
+                   docker stack deploy -c compose.yaml mystack
+                   '''
+            }
+        }
+    }
+}
